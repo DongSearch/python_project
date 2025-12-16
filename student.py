@@ -38,6 +38,11 @@ class Student() :
         
         return self.attendance_dict[key]
     
+    def delate_attendance(self,date = None):
+        if date is None :
+            raise ValueError("date should be provided")
+        del self.attendance_dict[date]
+    
     def to_dict(self) :
         s = {}
         s["id"] = self.id

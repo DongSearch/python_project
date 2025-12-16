@@ -73,10 +73,58 @@ class StudentApp :
 
         win = tk.Toplevel(self.root)
         win.title("Student Detail")
-        text = tk.Text(win, wrap=tk.WORD)
-        text.pack()
-        text.insert(tk.END, json.dumps(student.to_dict(), indent=4, ensure_ascii=False) )
-        text.config(state=tk.DISABLED)
+        top = tk.Frame(win)
+        top.pack(side=tk.TOP, fill=tk.X, padx=10, pady=10)
+        tk.Label(top, text = " Student Detail ", font=("Arial", 16)).pack()
+        bottom = tk.Frame(win)
+        bottom.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True, padx=10, pady=10)
+        tk.Label(bottom , text = " Attendance Records ", font=("Arial", 14)).pack()
+        self.att = ttk.Treeview(bottom, columns=("Date", "Status", "Note"), show ="headings")
+        self.att.heading("Date" , text= "Date")
+        self.att.heading("Status" , text= "Status")
+        self.att.heading("Note" , text= "Note")    
+        self.att.pack(fill=tk.BOTH, expand=True)
+        self.att.delete(*self.att.get_children())
+        for k, v in student.attendance_dict.items():
+            self.att.insert("", tk.END, values=(v.date.isoformat(), v.status, v.note))
+        tk.Button(bottom, text= "Add", command= lambda:self.add_attendance(student)).pack(pady=5)
+
+    
+    
+    def add_attendance(self, student):
+        att_win = tk.Toplevel(self.root)
+        att_win.title("Add Attendance")
+        tk.Label(att_win, text="Date (YYYY-MM-DD):").grid(row=0, column=0, pady=5)
+        e_date = tk.Entry(att_win, width=30)
+        e_date.grid(row=0, column=1, pady=5)
+        tk.Label(att_win, text="Status:").grid(row=1, column=0, pady=5)
+        c_status = ttk.Combobox(att_win, values =["present","absent","late","early","excused"], width=27)
+        c_status.grid(row=1, column=1, pady=5)
+        tk.Label(att_win, text="Note:").grid(row=2, column=0, pady=5)   
+        e_note = tk.Entry(att_win, width=30)
+        e_note.grid(row=2, column=1, pady=5)
+        def submit_att():
+            date = e_date.get()
+            status = c_status.get()
+            note = e_note.get()
+            try :
+                student.add_attendance(date=date, status=status, note=note)
+                v = student.attendance_dict[date]
+                self.att.insert("", tk.END, values=(v.date.isoformat(), v.status, v.note))
+                att_win.destroy()
+            except ValueError as e:
+                messagebox.showerror("Error", str(e))
+        tk.Button(att_win, text="Submit", command=submit_att).grid(row=3, column=0, columnspan=2, pady=10)
+        
+
+
+        
+
+
+        
+
+
+
 
     def save_data(self):
         self.manager.save("students_data.json")
