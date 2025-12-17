@@ -38,7 +38,7 @@ class Student() :
         
         return self.attendance_dict[key]
     
-    def delate_attendance(self,date = None):
+    def delete_attendance(self,date = None):
         if date is None :
             raise ValueError("date should be provided")
         del self.attendance_dict[date]
@@ -85,7 +85,7 @@ class Student() :
         self._recalculate_final_score()
 
         
-    def remove_grade(self,key):
+    def delete_grade(self,key):
         if key not in self.grade_list.keys():
             raise ValueError("we can't find the grade")
         del self.grade_list[key]
